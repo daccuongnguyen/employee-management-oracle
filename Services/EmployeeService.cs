@@ -1,4 +1,4 @@
-using EmployeeManagement.Models;
+﻿using EmployeeManagement.Models;
 using Oracle.ManagedDataAccess.Client;
 
 namespace EmployeeManagement.Services
@@ -61,5 +61,33 @@ namespace EmployeeManagement.Services
             cmd.Parameters.Add(new OracleParameter("id", id));
             cmd.ExecuteNonQuery();
         }
+
+        // 🔹 Register user (Employee)
+        //public bool Register(string username, string password, string email, int deptId)
+        //{
+        //    if (_employees.Any(e => e.Name == username)) return false;
+
+        //    var emp = new Employee
+        //    {
+        //        Id = _nextId++,
+        //        Name = username,
+        //        Email = email,
+        //        DepartmentId = deptId
+        //    };
+        //    emp.PasswordHash = _passwordHasher.HashPassword(emp, password);
+
+        //    _employees.Add(emp);
+        //    return true;
+        //}
+
+        //// 🔹 Validate login
+        //public Employee? ValidateUser(string username, string password)
+        //{
+        //    var emp = _employees.FirstOrDefault(e => e.Name == username);
+        //    if (emp == null) return null;
+
+        //    var result = _passwordHasher.VerifyHashedPassword(emp, emp.PasswordHash, password);
+        //    return result == PasswordVerificationResult.Success ? emp : null;
+        //}
     }
 }
