@@ -52,7 +52,7 @@ namespace EmployeeManagement.Services
             cmd.ExecuteNonQuery();
         }
 
-        public void Delete(int id)
+        public bool Delete(int id)
         {
             using var conn = OracleDbService.GetConnection();
             conn.Open();
@@ -60,6 +60,9 @@ namespace EmployeeManagement.Services
             cmd.CommandText = "DELETE FROM EMPLOYEES WHERE ID = :id";
             cmd.Parameters.Add(new OracleParameter("id", id));
             cmd.ExecuteNonQuery();
+            int rowsAffected = cmd.ExecuteNonQuery(); // số dòng bị xóa
+
+            return rowsAffected > 0; // true nếu có ít nhất 1 dòng bị xóa
         }
 
         // 🔹 Register user (Employee)
