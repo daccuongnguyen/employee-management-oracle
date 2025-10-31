@@ -24,17 +24,48 @@ namespace EmployeeManagement.Controllers
         }
 
         [HttpPost("login")]
-        [AllowAnonymous] // login không cần JWT
+        [AllowAnonymous]
         public IActionResult Login([FromBody] LoginModel model)
         {
-            // Demo check user
             if (model.Username == "admin" && model.Password == "123")
             {
-                var token = GenerateJwtToken(model.Username);
-                return Ok(new { token, username = model.Username });
+                var token = GenerateJwtToken(model.Username, "Admin");
+                var refreshToken = Guid.NewGuid().ToString(); // fake demo
+                                                              // Trong thực tế, bạn sẽ lưu refreshToken này vào DB
+                return Ok(new { token, refreshToken, username = model.Username, role = "Admin" });
             }
+            else if (model.Username == "user" && model.Password == "123")
+            {
+                var token = GenerateJwtToken(model.Username, "User");
+                var refreshToken = Guid.NewGuid().ToString();
+                return Ok(new { token, refreshToken, username = model.Username, role = "User" });
+            }
+
             return Unauthorized();
         }
+
+        [HttpPost("refresh")]
+        [AllowAnonymous]
+        public IActionResult Refresh([FromBody] RefreshModel model)
+        {
+            // Trong thực tế, bạn cần xác minh refreshToken từ DB
+            // Ở đây demo cho phép làm mới token nếu refreshToken != null
+            if (!string.IsNullOrEmpty(model.RefreshToken))
+            {
+                var username = "admin"; // hoặc lấy từ DB
+                var role = "Admin";
+                var newToken = GenerateJwtToken(username, role);
+                return Ok(new { token = newToken });
+            }
+
+            return Unauthorized();
+        }
+
+        public class RefreshModel
+        {
+            public string RefreshToken { get; set; } = string.Empty;
+        }
+
 
         [HttpGet]
         public IActionResult GetAll() => Ok(_service.GetAll());
@@ -60,7 +91,7 @@ namespace EmployeeManagement.Controllers
             return Ok();
         }
 
-        private string GenerateJwtToken(string username)
+        private string GenerateJwtToken(string username, string role)
         {
             var jwtSettings = _config.GetSection("Jwt");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings["Key"]));
@@ -68,9 +99,9 @@ namespace EmployeeManagement.Controllers
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, username),
-                new Claim(ClaimTypes.Role, "Admin") // 👈 có thể đổi role
-            };
+        new Claim(ClaimTypes.Name, username),
+        new Claim(ClaimTypes.Role, role)
+    };
 
             var token = new JwtSecurityToken(
                 issuer: jwtSettings["Issuer"],
@@ -82,6 +113,7 @@ namespace EmployeeManagement.Controllers
 
             return new JwtSecurityTokenHandler().WriteToken(token);
         }
+
     }
 
     public class LoginModel

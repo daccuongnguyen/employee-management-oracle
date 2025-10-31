@@ -32,7 +32,9 @@ builder.Services.AddAuthentication(options =>
 builder.Services.AddAuthorization();
 
 // Add services to the container.
-builder.Services.AddControllers();
+builder.Services.AddControllersWithViews();
+builder.Services.AddRazorPages();
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -66,6 +68,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+app.UseStaticFiles();
+
 
 app.UseCors("AllowAll");
 app.UseAuthentication();  // 👈 phải có trước UseAuthorization
@@ -73,5 +77,14 @@ app.UseAuthentication();  // 👈 phải có trước UseAuthorization
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Login}/{action=Index}/{id?}"
+);
+
+//app.MapControllerRoute(
+//    name: "default",
+//    pattern: "{controller=Home}/{action=Index}/{id?}"
+//);
 
 app.Run();
